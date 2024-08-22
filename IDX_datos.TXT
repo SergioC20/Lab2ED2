@@ -1,0 +1,5 @@
+Node(keys=[3, 5, 7])
+  Node(keys=[(1, 'Kearney'), (2, 'Marabel')])
+  Node(keys=[(3, 'Susie'), (4, 'Pen')])
+  Node(keys=[(5, 'Lauren'), (6, 'Ty')])
+  Node(keys=[(7, 'Blinny'), (8, 'Stanwood'), (9, 'Audrye'), (10, 'Roderick')])
