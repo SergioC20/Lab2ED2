@@ -62,19 +62,6 @@ class BPlusTree:
             z.children = y.children[t:]
             y.children = y.children[:t]
 
-    def search(self, k, x=None):
-        if x is None:
-            x = self.root
-        while not x.leaf:
-            i = 0
-            while i < len(x.keys) and k >= x.keys[i]:
-                i += 1
-            x = x.children[i]
-        for i, key_value in enumerate(x.keys):
-            if key_value[0] == k:
-                return x, i
-        return None
-
     def save_to_file(self, filename):
         with open(filename, 'w') as f:
             self._write_node(self.root, f, 0)
@@ -141,6 +128,6 @@ def process_file(filename, t):
         print(timing_results_content)
 
 if __name__ == "__main__":
-    t = int(input("Ingrese el grado mínimo del árbol B+ (t): "))
+    t = int(input("Ingrese el grado del árbol B+ (d): "))
     filename = input("Ingrese el nombre del archivo de comandos: ")
     process_file(filename, t)
