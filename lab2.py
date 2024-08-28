@@ -16,32 +16,32 @@ class BPlusTree:
 
     def insert(self, k, name):
         root = self.root
-        if len(root.keys) == (2 * self.t) - 1:
-            temp = BPlusNode()
-            self.root = temp
-            temp.children.insert(0, root)
+        if len(root.keys) == (2 * self.t) - 1: #verifica si la raiz esta llena
+            temp = BPlusNode() #crea un nuevo nodo temporal
+            self.root = temp #asigna temp como la nueva raiz
+            temp.children.insert(0, root) 
             self.split_child(temp, 0)
             self.insert_non_full(temp, k, name)
-        else:
+        else: #si no esta llena la raiz
             self.insert_non_full(root, k, name)
 
     def insert_non_full(self, x, k, name):
         i = len(x.keys) - 1
-        if x.leaf:
-            x.keys.append((None, None))
-            while i >= 0 and k < x.keys[i][0]:
+        if x.leaf: #si x es una hoja
+            x.keys.append((None, None)) #añade un espacio vacio para la nueva clave
+            while i >= 0 and k < x.keys[i][0]: #
                 x.keys[i + 1] = x.keys[i]
                 i -= 1
-            x.keys[i + 1] = (k, name)
-        else:
+            x.keys[i + 1] = (k, name) #inserta x en la poscion correcta
+        else: #si x no es hoja
             while i >= 0 and k < x.keys[i]:
                 i -= 1
             i += 1
-            if len(x.children[i].keys) == (2 * self.t) - 1:
-                self.split_child(x, i)
+            if len(x.children[i].keys) == (2 * self.t) - 1: #verifica si el hijo esta lleno 
+                self.split_child(x, i) #llama a la funcion para dividir el hijo
                 if k > x.keys[i]:
                     i += 1
-            self.insert_non_full(x.children[i], k, name)
+            self.insert_non_full(x.children[i], k, name) #llama recursivamente a la funcion
 
     def split_child(self, x, i):
         t = self.t
@@ -49,20 +49,20 @@ class BPlusTree:
         z = BPlusNode(y.leaf)
         x.children.insert(i + 1, z)
         
-        if y.leaf:
-            z.keys = y.keys[t - 1:]
-            y.keys = y.keys[:t - 1]
-            x.keys.insert(i, z.keys[0][0])
+        if y.leaf: #si y es hoja
+            z.keys = y.keys[t - 1:] #Mover las claves de la segunda mitad de y a z
+            y.keys = y.keys[:t - 1] 
+            x.keys.insert(i, z.keys[0][0])#Insertar la primera clave de z en x en la posición i
             z.next = y.next
             y.next = z
-        else:
-            z.keys = y.keys[t:]
+        else: #si y no es hoja
+            z.keys = y.keys[t:] #Mover las claves de la segunda mitad de y a z
             y.keys = y.keys[:t - 1]
-            x.keys.insert(i, y.keys[-1])
+            x.keys.insert(i, y.keys[-1]) # Insertar la clave mediana de y en x en la posición i
             z.children = y.children[t:]
             y.children = y.children[:t]
 
-    def save_to_file(self, filename):
+    def save_to_file(self, filename): #escritura del archivo
         with open(filename, 'w') as f:
             self._write_node(self.root, f, 0)
     
@@ -72,7 +72,7 @@ class BPlusTree:
             for child in node.children:
                 self._write_node(child, f, level + 1)
 
-def process_file(filename, t):
+def process_file(filename, t): #lectura de archivo de insercion
     tree = BPlusTree(t)
     total_insert_time = 0
 

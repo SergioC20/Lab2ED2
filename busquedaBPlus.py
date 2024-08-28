@@ -1,5 +1,4 @@
 import time
-import datetime
 
 class BPlusNode:
     def __init__(self, leaf=False):
@@ -13,10 +12,9 @@ class BPlusTree:
         self.root = BPlusNode(True)
 
     def load_from_file(self, filename):
-        start_time = time.time()
-        start_dt = datetime.datetime.now()
+        start_time = time.time()  # Marca de tiempo inicial
 
-        with open(filename, 'r') as f:
+        with open(filename, 'r') as f: #abre el archivo del indice
             lines = f.readlines()
 
         level_nodes = {}
@@ -29,7 +27,6 @@ class BPlusTree:
             if not node_data:
                 continue
 
-            print(f"Processing line: {line.strip()}")  # Debugging line
             if '(' in node_data:  # Nodo hoja con tuplas
                 keys = eval(f"[{node_data}]")  # Convierte a lista de tuplas (key, name)
             else:  # Nodo interno con claves
@@ -58,24 +55,30 @@ class BPlusTree:
 
         self.root = level_nodes[0][0]  # El primer nodo del nivel 0 es la raíz
 
-        end_time = time.time()
-        end_dt = datetime.datetime.now()
-        elapsed_time = end_time - start_time
-
-        print(f'Cargar archivo: Inicio: {start_dt}, Fin: {end_dt}, Tiempo: {elapsed_time:.6f} segundos')
+        end_time = time.time()  # Marca de tiempo final
+        elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
+        print(f'El tiempo total de carga y almacenamiento en memoria es: {elapsed_time:.6f} segundos')
 
     def search(self, k):
-        node = self.root
-        while not node.leaf:
+        def find_leaf_node(node, k): #funcion auxiliar recursiva para encontrar el nodo hoja que podria contener la clave k
+            if node.leaf: # si el nodo es hoja devolverlo
+                return node
+            
             i = 0
-            while i < len(node.keys) and k >= node.keys[i]:
+            while i < len(node.keys) and k > node.keys[i]: # recorrer las claves del nodo hasta encontrar la posicion correcta de la clave k
                 i += 1
-            node = node.children[i]
-        for key, name in node.keys:
-            if key == k:
-                return name
-        return None
+            return find_leaf_node(node.children[i], k) # llamada recursiva a find_leaf_node con el hijo correspondiente
 
+        leaf = find_leaf_node(self.root, k)  # iniciar la búsqueda desde la raiz y encontrar la hoja donde podría estar la clave k
+
+        
+        while leaf: # buscar en todas las hojas a partir de la hoja encontrada
+            for key, name in leaf.keys:  # recorrer todas las tuplas (clave, nombre) en la hoja
+                if key == k: # si se encuentra la clave devuelve el nombre asociado
+                    return name
+            leaf = leaf.next # si no se encuentra en esta hoja moverse a la siguiente hoja enlazada
+
+        return None # si no se encuentra la clave en el arbol devuelve None
 
 def main():
     filename = input("Ingrese el nombre del archivo de índice: ")
@@ -89,18 +92,13 @@ def main():
         if id_to_search.lower() == 'exit':
             break
         try:
-            id_to_search = int(id_to_search)
-            start_time = time.time()
-            start_dt = datetime.datetime.now()
-            result = tree.search(id_to_search)
-            end_time = time.time()
-            end_dt = datetime.datetime.now()
-            elapsed_time = end_time - start_time
-            if result:
+            id_to_search = int(id_to_search) #recibe el valor del id a buscar
+            result = tree.search(id_to_search) #burca el id en el arbol
+            if result: #si encuentra el id 
                 print(f"ID: {id_to_search}, Nombre: {result}")
-            else:
+            else: #si no encuentra el id
                 print(f"ID {id_to_search} no encontrado en el árbol.")
-        except ValueError:
+        except ValueError: #si recibe un valor diferenre a un entero o a la palabra "exit"
             print("Por favor, ingrese un número entero válido.")
 
 if __name__ == "__main__":

@@ -1,1 +1,2 @@
-Tiempo total de todas las inserciones: 0.017765 segundos
+Tiempo total de todas las inserciones: 0.004034 segundos
+Tiempo de escritura del archivo: 0.010467 segundos
